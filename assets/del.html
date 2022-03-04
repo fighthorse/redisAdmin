@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset=utf-8>
+    <title>Redis Admin By Golang</title>
+    <link rel="stylesheet" href="/assets/bootstrap/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="/assets/bootstrap/bootstrap-theme.css" crossorigin="anonymous">
+    <script src="/assets/bootstrap/jquery.min.js" type="text/JavaScript"></script>
+    <script src="/assets/bootstrap/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="/assets/bootstrap/crypto-js.js" type="text/JavaScript"></script>
+    <script src="/assets/layer/layer.js" type="text/JavaScript"></script>
+    <script src="/assets/layer/localcache.js" type="text/JavaScript"></script>
+    <style>
+        body {
+            font-family: Verdana, sans-serif;
+            font-size: 0.8em;
+        }
+
+        header, footer, section, article {
+            border: 1px solid grey;
+            margin: 5px;
+            margin-bottom: 15px;
+            padding: 8px;
+            background-color: white;
+        }
+
+        header, footer {
+            color: white;
+            background-color: #444;
+            margin-bottom: 5px;
+        }
+
+        footer {
+
+        }
+
+        section {
+            background-color: #ddd;
+        }
+
+        nav ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Redis Admin By Golang</h1>
+</header>
+<nav>
+    <ul>
+        <li><a href="index.html">首页</a></li>
+        <li><a href="del.html" class="active">批量删除</a></li>
+    </ul>
+</nav>
+<section>
+    <div class='container'>
+        <div class="row" id="UnLoginForm">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label class="sr-only" for="exampleInputEmail3">用户名</label>
+                    <input type="text" class="form-control" id="UserName" placeholder="UserName"
+                           aria-describedby="inputSuccess4Status">
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+                    <span id="inputSuccess4Status" class="sr-only">(success)</span>
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="exampleInputPassword3">密码</label>
+                    <input type="password" class="form-control" id="Password" placeholder="Password">
+                </div>
+                <button type="button" class="btn btn-success" onclick="Login()">登录</button>
+            </form>
+        </div>
+    </div>
+    <div class='container' style="display:none">
+        <div class="row">
+            <div class="col-xs-12 col-md-8">.col-xs-12 .col-md-8</div>
+            <div class="col-xs-6 col-md-4">.col-xs-6 .col-md-4</div>
+        </div>
+        <div class="row">
+
+        </div>
+    </div>
+</section>
+<footer>
+    <p>© 2022 RedisAdmin. All rights reserved.</p>
+</footer>
+</body>
+<script src="/assets/js/redis.js" type="text/JavaScript"></script>
+</html>
