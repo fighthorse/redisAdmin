@@ -29,7 +29,7 @@ file_path = "/data/logs/app/access.log"
 enabled = true
 sampling = 1.0
 service_name = "redis-admin"
-file_path = "/data/logs/trace/trace.log"
+file_path = "/data/logs/trace/trace_redis.log"
 
 #------配置默认redis链接-----------
 [[redis]]
@@ -58,9 +58,34 @@ user_pwd = "123456"
 env = "qa"
 service_name = "go-admin-redis"
 
-[[server]]
+[amap_server]
+key = "2d9e0c60805e044ea402b282776175bf"
+
+[http_server]
+self_service_name = "go_redis_admin"
+close_breaker = false
+
+[[http_breaker]]
+name = "default"
+maxRequests = 1
+interval = 1
+timeout = 10
+failureRatio = 1
+consecutiveFailures = 100
+
+[[child_server]]
+name = "amap"
+url = "https://restapi.amap.com"
+discovery_service_name = ""
+discovery_tag = ""
+timeout = 0.3
+
+[[child_server]]
 name = "baidu"
-url = "http://www.baidu.com"
+url = "https://www.baidu.com"
+discovery_service_name = ""
+discovery_tag = ""
+timeout = 0.3
 
 [[mysql]]
 name = "base"

@@ -16,6 +16,10 @@ go run main.go -env=local
 http://127.0.0.1:10110/assets/
 ```
 
+项目容器化
+可以参考cicd.txt
+打包成镜像文件 直接发布
+
 项目配置文件 config/local.toml
 登录账户 login_user
 服务端端口 transport
@@ -37,7 +41,7 @@ CHANGE_LOG
 |  版本   | 内容  |  时间 |
 |  ----  | ----  |  --- |
 | v0.0.1 | 初始化项目init | 2022-03-03 |
-|    |   |    |
+| v0.0.2 | 阶段2。0 | 2022-04-03 |
 |    |   |    |
 |    |   |    |
 

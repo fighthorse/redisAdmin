@@ -12,4 +12,5 @@ func RegisterHttp(r *gin.Engine) {
 	r.GET("/service", Service)
 	r.GET("/reload", Reload)
 	r.GET("/stop", Stop)
+	r.GET("/pid", Pid)
 }

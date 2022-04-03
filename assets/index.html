@@ -167,17 +167,20 @@
                 <div class="row">
                     <div class="form-group col-xs-3 col-sm-3">
                         <select class="form-control" id="Handletype">
-                            <option value="GET">GET</option>
-                            <option value="SET">SET</option>
-                            <option value="DEL">DEL</option>
-                            <option value="HGET">HGET</option>
-                            <option value="HSET">HSET</option>
-                            <option value="HLEN">HLEN</option>
-                            <option value="TTL">TTL</option>
+                            <option value="GET">GET 获取key</option>
+                            <option value="SET">SET 设置key</option>
+                            <option value="DEL">DEL 删除key</option>
+                            <option value="HGET">HGET 获取hash</option>
+                            <option value="HSET">HSET 添加hash</option>
+                            <option value="SADD">SADD 添加集合元素</option>
+                            <option value="SREM">SREM 删除集合元素</option>
+                            <option value="SMEMBERS">SMEMBERS 查询集合元素</option>
+                            <option value="ZADD">ZADD 添加有序集合元素</option>
+                            <option value="ZREM">ZREM 删除有序集合元素</option>
                         </select>
                     </div>
                     <div class="form-group col-xs-3 col-sm-3">
-                        <input type="text" class="form-control" id="HandleKey" placeholder="输入key">
+                        <input type="text" class="form-control" id="HandleKey" placeholder="输入key / hash数据 逗号分隔">
                     </div>
                     <div class="form-group col-xs-3 col-sm-3">
                         <input class="form-control" type="text" id="HandleTTl" placeholder="过期时间 s">
@@ -244,7 +247,7 @@
                         </div>
                         <div style="display: none" id="TableResultHtml">
                             <div>
-                                <h3>数据明细</h3>
+                                <h3>数据明细(<b id="key_len">0</b>)</h3>
                                 <div class="table-responsive">
                                     <table class="table table-striped">
                                         <tbody id="TabResult">

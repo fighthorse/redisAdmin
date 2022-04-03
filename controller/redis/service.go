@@ -3,9 +3,9 @@ package redis
 import (
 	"errors"
 
-	"github.com/fighthorse/redisAdmin/pkg/self_errors"
+	"github.com/fighthorse/redisAdmin/component/self_errors"
+	"github.com/fighthorse/redisAdmin/internal/service/work"
 	"github.com/fighthorse/redisAdmin/protos"
-	"github.com/fighthorse/redisAdmin/service/work"
 	"github.com/gin-gonic/gin"
 )
 

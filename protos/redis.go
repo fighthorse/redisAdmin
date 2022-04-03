@@ -30,17 +30,28 @@ type SearchKeyReq struct {
 }
 
 type KeysInfo struct {
-	Type  string            `form:"type" json:"type" mapstructure:"type"`
+	Type  string            `form:"type" json:"type" mapstructure:"type"` // msg 提示性数据返回
+	Data  string            `form:"data" json:"data" mapstructure:"data"`
 	Keys  string            `form:"keys" json:"keys" mapstructure:"keys"`
 	Value string            `form:"value" json:"value" mapstructure:"value"`
 	Ttl   time.Duration     `form:"ttl" json:"ttl" mapstructure:"ttl"`
 	List  []ListRes         `form:"list" json:"list" mapstructure:"list"`
 	Hash  map[string]string `form:"hash" json:"hash" mapstructure:"hash"`
-	Page  int               `form:"page" json:"page" mapstructure:"page"`
-	Total int               `form:"total" json:"total" mapstructure:"total"`
+
+	Zset []ZSET `form:"zset" json:"zset" mapstructure:"zset"`
+
+	Page  int `form:"page" json:"page" mapstructure:"page"`
+	Total int `form:"total" json:"total" mapstructure:"total"`
+
+	Length int64 `form:"length" json:"length" mapstructure:"length"`
 }
 
 type ListRes struct {
 	Index int    `form:"index" json:"index" mapstructure:"index"`
 	Value string `form:"value" json:"value" mapstructure:"value"`
+}
+
+type ZSET struct {
+	Score  float64     `form:"score" json:"score" mapstructure:"score"`
+	Member interface{} `form:"member" json:"member" mapstructure:"member"`
 }

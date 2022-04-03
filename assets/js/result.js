@@ -10,8 +10,9 @@ function ShowResult(dataRes) {
 
     $("#TableResultHtml").hide();
     $("#aloneKeyShow").show();
-
-    if (dataRes.type === "string") {
+    if (dataRes.type === "msg"){
+        layer.msg(dataRes.data)
+    }else if (dataRes.type === "string") {
         $("#key_value").val(dataRes.value)
     } else if (dataRes.type === "list") {
         $("#total_page").val(dataRes.total);
@@ -30,6 +31,7 @@ function ShowResult(dataRes) {
             str += '</tr>'
         }
         $("#TabResult").html(str);
+        $("#key_len").html(dataRes.length)
         $("#TableResultHtml").show()
     } else if (dataRes.type === "hash") {
         $("#total_page").val(dataRes.total);
@@ -49,7 +51,53 @@ function ShowResult(dataRes) {
         }
 
         $("#TabResult").html(str);
+        $("#key_len").html(dataRes.length)
         $("#TableResultHtml").show()
+    }else if (dataRes.type === "set") {
+        $("#total_page").val(dataRes.total);
+        let str = '';
+
+        str += '<tr>';
+        str += '<td colspan="3" ><textarea  class="form-control"  id="new_set_value" placeholder="输入值 逗号分隔 "></textarea></td>';
+        str += '<td><a onclick="AddSet(' + dataRes.keys + ')">新增</a></td>';
+        str += '</tr><tr class="success" ><td>#</td><td colspan="2" >集合value</td><td></td></tr>';
+
+        let ii = 0
+        for (var i in dataRes.hash) {
+            str += '<tr>';
+            ii++
+            str += '<td style="width: 100px;">' + ii + '</td><td colspan="2" ><input class="form-control" id="list_index_' + i + '" value="' + dataRes.hash[i] + '" disabled></td>';
+            str += '<td><a onclick="DelSET(' + dataRes.keys + ')">删除</a></td>';
+            str += '</tr>'
+        }
+
+        $("#TabResult").html(str);
+        $("#key_len").html(dataRes.length)
+        $("#TableResultHtml").show()
+    }else if (dataRes.type === "zset") {
+        $("#total_page").val(dataRes.total);
+        let str = '';
+
+        str += '<tr>';
+        str += '<td><input class="form-control" id="new_set_score" placeholder="输入分值" ></td><td colspan="2" ><input class="form-control"  id="new_set_value" placeholder="输入值"/></td>';
+        str += '<td><a onclick="AddSet(' + dataRes.keys + ')">新增</a></td>';
+        str += '</tr><tr class="success" ><td>score</td><td colspan="2" >value</td><td></td></tr>';
+
+        for (var i in dataRes.zset) {
+            let item = dataRes.zset[i]
+            str += '<tr>';
+            str += '<td style="width: 100px;">' + item.score + '</td><td colspan="2" ><input class="form-control" id="list_index_' + i + '" value="' + item.member + '" disabled></td>';
+            str += '<td><a onclick="DelZSET(' + dataRes.keys + ','+ item.member +')">删除</a></td>';
+            str += '</tr>'
+        }
+
+        $("#TabResult").html(str);
+        $("#key_len").html(dataRes.length)
+        $("#TableResultHtml").show()
+    }else if (dataRes.type === "bitmap") {
+        console.log(dataRes)
+    }else{
+        console.log(dataRes)
     }
 }
 
@@ -77,6 +125,17 @@ function UpdateHash(keys, index) {
 
 }
 
+function AddSet(keys) {
+
+}
+
+function DelSET(keys) {
+
+}
+
+function DelZSET(keys, value) {
+
+}
 function switchPage() {
     var data = {
         "client": $("#SelectDB").val(),
