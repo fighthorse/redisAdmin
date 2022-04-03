@@ -4,12 +4,12 @@ import (
 	"errors"
 	"time"
 
-	"github.com/fighthorse/redisAdmin/pkg/gocache"
-	"github.com/fighthorse/redisAdmin/pkg/gotoken"
-	"github.com/fighthorse/redisAdmin/pkg/log"
-	"github.com/fighthorse/redisAdmin/pkg/self_errors"
+	"github.com/fighthorse/redisAdmin/component/gocache"
+	"github.com/fighthorse/redisAdmin/component/gotoken"
+	"github.com/fighthorse/redisAdmin/component/log"
+	"github.com/fighthorse/redisAdmin/component/self_errors"
+	"github.com/fighthorse/redisAdmin/internal/service/login"
 	"github.com/fighthorse/redisAdmin/protos"
-	"github.com/fighthorse/redisAdmin/service/login"
 	"github.com/gin-gonic/gin"
 )
 

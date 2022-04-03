@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"github.com/fighthorse/redisAdmin/pkg/middleware"
+	"github.com/fighthorse/redisAdmin/component/middleware"
 	"github.com/gin-gonic/gin"
 )
 

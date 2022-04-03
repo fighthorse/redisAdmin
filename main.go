@@ -3,21 +3,20 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"path/filepath"
 	"time"
 
+	"github.com/fighthorse/redisAdmin/component"
+	"github.com/fighthorse/redisAdmin/component/conf"
+	"github.com/fighthorse/redisAdmin/component/middleware"
+	"github.com/fighthorse/redisAdmin/component/thirdpart/jpillora/overseer"
 	"github.com/fighthorse/redisAdmin/controller"
-	"github.com/fighthorse/redisAdmin/pkg/conf"
-	"github.com/fighthorse/redisAdmin/pkg/log"
-	"github.com/fighthorse/redisAdmin/pkg/middleware"
-	"github.com/fighthorse/redisAdmin/pkg/redis"
-	"github.com/fighthorse/redisAdmin/pkg/thirdpart/jpillora/overseer"
-	"github.com/fighthorse/redisAdmin/pkg/thirdpart/trace_redis"
-	"github.com/fighthorse/redisAdmin/pkg/trace"
+	"github.com/fighthorse/redisAdmin/internal/pkg/httpserver"
+	"github.com/fighthorse/redisAdmin/internal/pkg/redis"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/sync/errgroup"
-
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/viper"
 )
 
@@ -25,18 +24,11 @@ import (
 // go tool compile -S main.go
 
 var (
-	g errgroup.Group
-
-	v = viper.New()
-
+	v   = viper.New()
 	env = flag.String("env", "local", "config file name")
 	//graceful = flag.Bool("graceful", false, "listen on fd open 3 (internal use only)")
 
-	graceful = flag.Bool("graceful", false, "listen on fd open 3 (internal use only)")
-
-	configpath = "./config"
-
-	overss overseer.State
+	confidant = "./config"
 
 	// BuildID is compile-time variable
 	BuildID = "0"
@@ -55,37 +47,78 @@ func readConfig(fileName, filePath string) {
 	if err := conf.Init(v); err != nil {
 		panic(err)
 	}
-
-	// 初始化数据
-	// redis-cfg
-	trace_redis.InitCfg(conf.GConfig.Redis)
-
-	//trace
-	trace.Init()
-
-	// log
-	log.Init()
-
-	// redis
-	redis.Init()
 }
 
 func main() {
 	flag.Parse()
-
 	// 如果env使用的是绝对路径，则configpath为路径，env为文件名
 	if filepath.IsAbs(*env) {
-		configpath, *env = filepath.Split(*env)
+		confidant, *env = filepath.Split(*env)
+	}
+	//config init
+	readConfig(*env, confidant)
+	// 初始化数据
+	component.InitComponent()
+	// redis
+	redis.Init()
+	// http
+	httpserver.Init()
+	// start server
+	StartListenServer()
+}
+
+func StartListenServer() {
+	srv := conf.GConfig.Transport
+	fmt.Println("RUN Listen port " + srv.HTTP.Addr)
+	fmt.Println("RUN Listen inner port " + srv.InnerHTTP.Addr)
+
+	// kill -HUP pid
+	overseer.Run(overseer.Config{
+		Required:            true,
+		Program:             Program,
+		Address:             "",
+		Addresses:           []string{srv.HTTP.Addr, srv.InnerHTTP.Addr}, // 二选一 port
+		TerminateTimeout:    10 * time.Second,
+		MinFetchInterval:    0,
+		PreUpgrade:          nil,
+		Debug:               false, //display log of overseer actions
+		NoWarn:              false,
+		NoRestart:           false,
+		NoRestartAfterFetch: false,
+		Fetcher:             nil,
+	})
+}
+
+func Program(state overseer.State) {
+	fmt.Printf("app#%s (%s) listening... \n", BuildID, state.ID)
+	// inner
+	if len(state.Listeners) >= 1 {
+		InnerListener(state.Listeners[1])
 	}
 
-	readConfig(*env, configpath)
-	fmt.Println("RUN Env:" + *env)
-	//if *env == "prd" {
-	gin.SetMode(gin.ReleaseMode)
-	//}else{
-	//    gin.SetMode(gin.DebugMode)
-	//}
+	err := http.Serve(state.Listeners[0], MainContainer())
+	fmt.Printf("app#%s (%s) exiting...\n", BuildID, state.ID)
+	if err != nil {
+		fmt.Printf("error exiting...%v \n", err)
+	}
+}
 
+func InnerListener(listener net.Listener) {
+	go func() {
+		//新的prometheus监控接口
+		mux := http.NewServeMux()
+		mux.HandleFunc("/metrics", func(writer http.ResponseWriter, request *http.Request) {
+			promhttp.Handler().ServeHTTP(writer, request)
+		})
+		err := http.Serve(listener, mux)
+		if err != nil {
+			panic(err)
+		}
+	}()
+}
+
+func MainContainer() http.Handler {
+	gin.SetMode(gin.ReleaseMode)
 	// Creates a router without any middleware by default
 	r := gin.New()
 	// Global middleware
@@ -107,41 +140,16 @@ func main() {
 	if err := controller.Init(r); err != nil {
 		panic(err)
 	}
-	StartListenServer(r)
+	return r
 }
 
-func StartListenServer(r *gin.Engine) {
-	srv := conf.GConfig.Transport
-	fmt.Println("RUN Listen port " + srv.HTTP.Addr)
-	//fmt.Println("Now Inner Server Listen:"+ srv.InnerHTTP.Addr)
-	// 如果开启了 必须指定地址
-	//var addresses []string
-	//addresses = append(addresses, srv.HTTP.Addr)
-	////addresses = append(addresses, srv.InnerHTTP.Addr)
-	//sort.Strings(addresses)
-
-	prog := func(state overseer.State) {
-		fmt.Printf("app#%s (%s) listening... \n", BuildID, state.ID)
-		err := http.Serve(state.Listener, r)
-		fmt.Printf("app#%s (%s) exiting...\n", BuildID, state.ID)
-		if err != nil {
-			fmt.Printf("error exiting...%v \n", err)
-		}
-	}
-	// kill -HUP pid
-	overseer.Run(overseer.Config{
-		Required:            true,
-		Program:             prog,
-		Address:             srv.HTTP.Addr,
-		Addresses:           nil, // 二选一 port
-		TerminateTimeout:    10 * time.Second,
-		MinFetchInterval:    0,
-		PreUpgrade:          nil,
-		Debug:               false, //display log of overseer actions
-		NoWarn:              false,
-		NoRestart:           false,
-		NoRestartAfterFetch: false,
-		Fetcher:             nil,
-	})
-
-}
+// init
+//func main(){
+//	// Creates a router without any middleware by default
+//	r := gin.New()
+//	// 初始化api
+//	if err := controller.Init(r); err != nil {
+//		panic(err)
+//	}
+//	_ = r.Run()
+//}

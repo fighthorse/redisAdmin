@@ -239,10 +239,9 @@ function HandleType() {
                 layer.msg(response.message);
                 return
             }
-            layer.msg(response.message);
-            var dataRes = response.data;
-            console.log(dataRes);
 
+            let dataRes = response.data;
+            ShowResult(dataRes)
         }
     });
 }
